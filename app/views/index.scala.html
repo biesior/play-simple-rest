@@ -1,7 +1,32 @@
-@(message: String)
+@(title: String, users: List[User])
 
-@main("Welcome to Play 2.0") {
-    
-    @play20.welcome(message, style = "Java")
+@main(title) {
+
+     <h1>@title</h1>
+
+     <h2>Actions</h2>
+     <ul>
+         <li><a href="@routes.Application.newForm()">Add user (form first)</a></li>
+         <li><a href="@routes.Application.simulateListUsersJson()">List users (JSON)</a></li>
+         <li><a href="@routes.Application.simulateListUsersXml()">List users (JSON)</a></li>
+     </ul>
+
+    <h2>Users</h2>
+
+
+    <table>
+      @for(user <- users){
+          <tr>
+              <td>@user.name</td>
+              <td>@user.nick </td>
+              <td><a href="@routes.Application.simulateGetUserJson(user.id)">JSON</td>
+              <td><a href="@routes.Application.simulateGetUserXml(user.id)">XML</td>
+              <td><a href="@routes.Application.editForm(user.id)">edit form (will send PUT)</td>
+              <td><a href="@routes.Application.simulateDeleteRequest(user.id)">DELETE (REST)</a> </td>
+          </tr>
+      }
+    </table>
+
+
     
 }

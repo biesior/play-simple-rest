@@ -2,8 +2,27 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.Application.index()
+# actions required for generating requests... (it may be avoid if 3-rd party apps does it...)
+GET     /                                   controllers.Application.index
+GET     /user-form                          controllers.Application.newForm
+GET     /user-form/:id                      controllers.Application.editForm(id: Int)
+
+GET     /simulate-delete-request/:id        controllers.Application.simulateDeleteRequest(id: Int)
+POST    /simulate-put-request/:id           controllers.Application.simulatePutRequest(id: Int)
+GET     /simulate-get-json/:id              controllers.Application.simulateGetUserJson(id: Int)
+GET     /simulate-get-xml/:id               controllers.Application.simulateGetUserXml(id: Int)
+
+GET     /simulate-get-json                  controllers.Application.simulateListUsersJson
+GET     /simulate-get-xml                   controllers.Application.simulateListUsersXml
+
+
+
+# REST actions
+GET     /user/:id                           controllers.Rest.user(id: Int)
+GET     /users                              controllers.Rest.users
+POST    /user                               controllers.Rest.createUser
+PUT     /user/:id                           controllers.Rest.updateUser(id: Int)
+DELETE  /user/:id                           controllers.Rest.deleteUser(id: Int)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

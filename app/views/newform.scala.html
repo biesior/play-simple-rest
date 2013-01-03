@@ -1,0 +1,13 @@
+@(title: String, userForm: Form[User])
+@main(title) {
+
+    <h1>Add user...</h1>
+
+    @helper.form(action = routes.Rest.createUser()) {
+
+        @helper.inputText(userForm("name")) <br>
+        @helper.inputText(userForm("nick")) <br>
+        <input type="submit" value="Create (REST)">
+
+    }
+}

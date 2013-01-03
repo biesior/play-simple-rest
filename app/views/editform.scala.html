@@ -1,0 +1,12 @@
+@(title: String, userForm: Form[User], userId: Int)
+@main(title) {
+
+    <h1>Edit user...</h1>
+
+    @helper.form(action = routes.Application.simulatePutRequest(userId)) {
+        @helper.inputText(userForm("name")) <br>
+        @helper.inputText(userForm("nick")) <br>
+        <input type="submit" value="Create (REST)">
+
+    }
+}

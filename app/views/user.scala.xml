@@ -1,0 +1,7 @@
+@(user: User)
+<?xml version="1.0" encoding="utf-8"?>
+<user>
+    <id>@user.id</id>
+    <name>@user.name</name>
+    <nick>@user.nick</nick>
+</user>
