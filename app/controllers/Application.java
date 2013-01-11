@@ -1,17 +1,21 @@
 package controllers;
 
 import models.User;
-
-
 import play.data.Form;
 import play.libs.F;
 import play.libs.WS;
-import play.mvc.*;
-
-import views.html.*;
+import play.mvc.Controller;
+import play.mvc.Http;
+import play.mvc.Result;
 import views.html.editform;
+import views.html.index;
+import views.html.newform;
 
+import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.List;
+
+import static play.Logger.*;
 
 public class Application extends Controller {
 
@@ -21,7 +25,16 @@ public class Application extends Controller {
      * @return Result
      */
     public static Result index() {
+
+        if (forwardedFromHead()) {
+            debug("This request was forwarded from HEAD to GET");
+        } else {
+            debug("This is direct call");
+        }
+
+
         List<User> users = User.find.all();
+        response().setHeader(LAST_MODIFIED, new Date().toString());
         return ok(index.render("Home page...", users));
     }
 
@@ -43,6 +56,55 @@ public class Application extends Controller {
     public static Result editForm(int id) {
         Form<User> userForm = form(User.class).fill(User.find.byId(id));
         return ok(editform.render("Edit user", userForm, id));
+    }
+
+
+    /**
+     * Tries to get headers of resource with WebServices and return headers only.
+     *
+     * @param originalPath Path of the resource
+     * @return Headers for HEAD request
+     * @throws IllegalAccessException
+     */
+    public static Result autoHead(String originalPath) throws IllegalAccessException {
+
+        WS.WSRequestHolder forwardedRequest = WS.url("http://" + request().host() + request().path());
+        // this header will allow you to make additional choice i.e. avoid tracking the request or something else
+        // see condition in index() action
+        forwardedRequest.setHeader("X_FORWARD_FROM_HEAD", "true");
+
+        // Forward original headers
+        for (String header : request().headers().keySet()) {
+            forwardedRequest.setHeader(header, request().getHeader(header));
+        }
+
+        // Forward original queryString
+        for (String key : request().queryString().keySet()) {
+            for (String val : request().queryString().get(key)) {
+                forwardedRequest.setQueryParameter(key, val);
+            }
+        }
+
+        // Call the same path but with GET
+        WS.Response wsResponse = forwardedRequest.get().get();
+
+        // Set returned headers to the response
+        for (Field f : Http.HeaderNames.class.getFields()) {
+            String headerName = f.get(null).toString();
+            if (wsResponse.getHeader(headerName) != null) {
+                response().setHeader(headerName, wsResponse.getHeader(headerName));
+            }
+        }
+
+        return status(wsResponse.getStatus());
+    }
+
+    /**
+     * Checks if request if forwarded from HEAD request
+     * @return true if 'X_FORWARD_FROM_HEAD' header exists and is set to true
+     */
+    public static boolean forwardedFromHead() {
+        return (request().getHeader("X_FORWARD_FROM_HEAD") != null && "true".equals(request().getHeader("X_FORWARD_FROM_HEAD")));
     }
 
 

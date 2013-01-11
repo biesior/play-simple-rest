@@ -24,5 +24,12 @@ POST    /user                               controllers.Rest.createUser
 PUT     /user/:id                           controllers.Rest.updateUser(id: Int)
 DELETE  /user/:id                           controllers.Rest.deleteUser(id: Int)
 
+
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+# Try to handle uncatched HEAD request by translating it to GET
+# This two routes shoul be placed at the end
+HEAD    /                                   controllers.Application.autoHead(originalPath:String ?= "/")
+HEAD    /*originalPath                      controllers.Application.autoHead(originalPath:String)
